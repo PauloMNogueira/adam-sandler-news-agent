@@ -258,7 +258,7 @@
         async function loadReports() {
             try {
                 // Dados dos relatórios (será atualizado automaticamente)
-                const reports = [{"filename": "relatorio_20250926_192157.html", "title": "Relatório de Notícias sobre Adam Sandler - 26/09/2025", "news_count": 3, "timestamp": "20250926_192157", "date": "26/09/2025 19:21", "generated_at": "2025-09-26T19:21:57.875891"}];
+                const reports = [{"filename": "relatorio_20250926_194505.html", "title": "Relatório de Notícias sobre Adam Sandler - 26/09/2025", "news_count": 9, "timestamp": "1769456700", "date": "26/09/2025 19:45", "generated_at": "2025-09-26T19:45:57.875891"}];
                 
                 const container = document.getElementById('reports-container');
                 
@@ -287,8 +287,7 @@
                 // Atualizar estatísticas
                 document.getElementById('total-reports').textContent = reports.length;
                 document.getElementById('total-news').textContent = reports.reduce((sum, r) => sum + r.newsCount, 0);
-                document.getElementById('last-update').textContent = reports.length > 0 ? 
-                    new Date(reports[0].timestamp).toLocaleDateString('pt-BR') : '-';
+                
                     
             } catch (error) {
                 console.error('Erro ao carregar relatórios:', error);

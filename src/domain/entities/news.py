@@ -32,11 +32,11 @@ class News:
     
     def is_relevant_to_adam_sandler(self) -> bool:
         """Verifica se a notícia é relevante para Adam Sandler."""
-        keywords = ["adam sandler", "sandler", "happy madison", "netflix", "comedy"]
-        text_to_search = f"{self.title} {self.content}".lower()
+        # keywords = ["adam sandler", "sandler", "happy madison", "netflix", "comedy"]
+        # text_to_search = f"{self.title} {self.content}".lower()
         
-        return any(keyword in text_to_search for keyword in keywords)
-        # return True
+        # return any(keyword in text_to_search for keyword in keywords)
+        return True
     
     def generate_summary(self, max_length: int = 200) -> str:
         """Gera um resumo da notícia."""

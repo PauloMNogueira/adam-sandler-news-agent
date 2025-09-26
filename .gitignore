@@ -131,6 +131,8 @@ dmypy.json
 # Project specific
 reports/
 *.html
+!docs/*.html
+!docs/index.html
 *.txt
 logs/
 temp/
