@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adam Sandler News - Portal de Notícias</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            font-weight: 300;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-labels {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+        
+        .reports-section {
+            margin-top: 3rem;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            color: white;
+            text-align: center;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        
+        .report-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid #3498db;
+        }
+        
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+        
+        .report-title {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .report-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .report-date {
+            background: #ecf0f1;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+        
+        .report-news-count {
+            background: #e74c3c;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .report-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .report-link:hover {
+            background: linear-gradient(135deg, #2980b9, #1f4e79);
+            transform: scale(1.02);
+        }
+        
+        .no-reports {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            margin: 3rem 0;
+            opacity: 0.8;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 3rem;
+        }
+        
+        .refresh-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎬 Adam Sandler News</h1>
+        <p>Portal de Notícias com Análise Inteligente</p>
+    </div>
+    
+    <div class="container">
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-reports">0</div>
+                <div class="stat-label">Relatórios Gerados</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="total-news">0</div>
+                <div class="stat-label">Notícias Analisadas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="last-update">-</div>
+                <div class="stat-label">Última Atualização</div>
+            </div>
+        </div>
+        
+        <div class="reports-section">
+            <h2 class="section-title">📰 Relatórios Disponíveis</h2>
+            <div class="reports-grid" id="reports-container">
+                <div class="no-reports">
+                    Nenhum relatório disponível ainda.<br>
+                    Execute o sistema para gerar o primeiro relatório!
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>© 2025 Adam Sandler News Agent - Powered by AI Analysis</p>
+        <p>Atualizado automaticamente a cada geração de relatório</p>
+    </div>
+    
+    <button class="refresh-btn" onclick="location.reload()" title="Atualizar página">
+        🔄
+    </button>
+    
+    <script>
+        // Função para carregar e exibir relatórios
+        async function loadReports() {
+            try {
+                // Dados dos relatórios (será atualizado automaticamente)
+                const reports = [{"filename": "relatorio_20250926_192157.html", "title": "Relatório de Notícias sobre Adam Sandler - 26/09/2025", "news_count": 3, "timestamp": "20250926_192157", "date": "26/09/2025 19:21", "generated_at": "2025-09-26T19:21:57.875891"}];
+                
+                const container = document.getElementById('reports-container');
+                
+                if (reports.length === 0) {
+                    container.innerHTML = `
+                        <div class="no-reports">
+                            Nenhum relatório disponível ainda.<br>
+                            Execute o sistema para gerar o primeiro relatório!
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = reports.map(report => `
+                        <div class="report-card">
+                            <div class="report-title">${report.title}</div>
+                            <div class="report-meta">
+                                <span class="report-date">${report.date}</span>
+                                <span class="report-news-count">${report.newsCount} notícias</span>
+                            </div>
+                            <a href="${report.filename}" class="report-link" target="_blank">
+                                Ver Relatório Completo
+                            </a>
+                        </div>
+                    `).join('');
+                }
+                
+                // Atualizar estatísticas
+                document.getElementById('total-reports').textContent = reports.length;
+                document.getElementById('total-news').textContent = reports.reduce((sum, r) => sum + r.newsCount, 0);
+                document.getElementById('last-update').textContent = reports.length > 0 ? 
+                    new Date(reports[0].timestamp).toLocaleDateString('pt-BR') : '-';
+                    
+            } catch (error) {
+                console.error('Erro ao carregar relatórios:', error);
+            }
+        }
+        
+        // Carregar relatórios ao inicializar a página
+        document.addEventListener('DOMContentLoaded', loadReports);
+        
+        // Auto-refresh a cada 5 minutos
+        setInterval(loadReports, 5 * 60 * 1000);
+    </script>
+</body>
+</html>
