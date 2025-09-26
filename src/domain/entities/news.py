@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any
 
 
 @dataclass
@@ -14,6 +14,7 @@ class News:
     published_date: datetime
     author: Optional[str] = None
     summary: Optional[str] = None
+    ai_analysis: Optional[Dict[str, Any]] = None
     
     def __post_init__(self):
         """Validações da entidade."""
@@ -53,3 +54,13 @@ class News:
                 break
         
         return summary.strip()
+    
+    def has_ai_analysis(self) -> bool:
+        """Verifica se a notícia possui análise de IA."""
+        return self.ai_analysis is not None and self.ai_analysis.get('success', False)
+    
+    def get_ai_analysis_text(self) -> str:
+        """Retorna o texto da análise de IA ou mensagem padrão."""
+        if self.has_ai_analysis():
+            return self.ai_analysis.get('analysis', 'Análise não disponível')
+        return 'Análise não realizada'

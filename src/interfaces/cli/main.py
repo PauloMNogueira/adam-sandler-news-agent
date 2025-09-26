@@ -104,7 +104,11 @@ class AdamSandlerNewsAgentCLI:
         if not self.setup_repositories():
             return False
         
-        report = await self.use_case.execute_report_generation_only(output_file)
+        # Gerar relatório com publicação automática no GitHub Pages
+        report = await self.use_case.execute_report_generation_only(
+            save_to_file=output_file, 
+            publish_to_github=True
+        )
         return report is not None
     
     async def show_status(self) -> bool:

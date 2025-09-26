@@ -52,6 +52,37 @@ class ReportService:
         print(f"Relatório gerado com {len(relevant_news)} notícias relevantes")
         return report
     
+    async def generate_adam_sandler_report_from_news(self, news_list: List[News], title: Optional[str] = None) -> Report:
+        """Gera um relatório a partir de uma lista de notícias já processadas."""
+        if title is None:
+            title = f"Relatório de Notícias sobre Adam Sandler - {datetime.now().strftime('%d/%m/%Y')}"
+        
+        print("Gerando relatório a partir de notícias processadas...")
+        
+        # Criar relatório
+        report = Report(
+            title=title,
+            generated_at=datetime.now()
+        )
+        
+        # Adicionar notícias ao relatório
+        report.add_multiple_news(news_list)
+        
+        # Gerar resumo
+        report.summary = report.generate_summary()
+        
+        # Adicionar metadados
+        report.metadata = {
+            "total_sources_consulted": len(self.news_repository.get_available_sources()),
+            "total_news_found": len(news_list),
+            "relevant_news_count": len(news_list),
+            "generation_time": datetime.now().isoformat(),
+            "sources_summary": report.get_sources_summary()
+        }
+        
+        print(f"Relatório gerado com {len(news_list)} notícias")
+        return report
+    
     async def generate_and_send_report(self, recipient_email: str, 
                                      title: Optional[str] = None,
                                      send_html: bool = True) -> bool:
@@ -82,6 +113,10 @@ class ReportService:
         except Exception as e:
             print(f"Erro ao gerar e enviar relatório: {str(e)}")
             return False
+    
+    async def generate_html_report(self, report: Report) -> str:
+        """Gera o HTML do relatório."""
+        return report.to_html()
     
     async def generate_daily_report(self) -> Report:
         """Gera um relatório diário sobre Adam Sandler."""

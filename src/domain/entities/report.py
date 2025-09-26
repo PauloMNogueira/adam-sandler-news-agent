@@ -81,13 +81,24 @@ Principais notícias:
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{self.title}</title>
     <style>
-        body {{ font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }}
-        .header {{ background-color: #f4f4f4; padding: 20px; border-radius: 5px; }}
-        .news-item {{ border-bottom: 1px solid #eee; padding: 20px 0; }}
-        .news-title {{ font-size: 18px; font-weight: bold; color: #333; }}
-        .news-meta {{ color: #666; font-size: 14px; margin: 5px 0; }}
-        .news-summary {{ margin: 10px 0; }}
-        .sources-summary {{ background-color: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }}
+        body {{ font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }}
+        .header {{ background-color: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }}
+        .summary {{ background-color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #3498db; }}
+        .sources-summary {{ background-color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }}
+        .news-item {{ background-color: white; margin-bottom: 20px; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
+        .news-title {{ font-size: 18px; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }}
+        .news-meta {{ color: #7f8c8d; font-size: 14px; margin-bottom: 15px; }}
+        .news-meta a {{ color: #3498db; text-decoration: none; }}
+        .news-meta a:hover {{ text-decoration: underline; }}
+        .news-summary {{ line-height: 1.6; color: #34495e; }}
+        .ai-analysis {{ margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 6px; border-left: 4px solid #e74c3c; }}
+        .ai-analysis h4 {{ margin: 0 0 10px 0; color: #e74c3c; font-size: 16px; }}
+        .analysis-content {{ line-height: 1.6; color: #2c3e50; }}
+        .analysis-content h3 {{ color: #e74c3c; margin-top: 15px; margin-bottom: 8px; }}
+        .analysis-content p {{ margin-bottom: 10px; }}
+        .analysis-content strong {{ color: #2c3e50; }}
+        ul {{ margin: 10px 0; }}
+        li {{ margin-bottom: 5px; }}
     </style>
 </head>
 <body>
@@ -120,7 +131,19 @@ Principais notícias:
             Data: {news.published_date.strftime('%d/%m/%Y')} |
             <a href="{news.url}" target="_blank">Ver notícia completa</a>
         </div>
-        <div class="news-summary">{news.generate_summary()}</div>
+        <div class="news-summary">{news.generate_summary()}</div>"""
+            
+            # Adicionar análise de IA se disponível
+            if news.has_ai_analysis():
+                html += f"""
+        <div class="ai-analysis">
+            <h4>🤖 Análise Inteligente:</h4>
+            <div class="analysis-content">
+                {news.get_ai_analysis_text()}
+            </div>
+        </div>"""
+            
+            html += """
     </div>
 """
         

@@ -7,6 +7,9 @@ from ...domain.entities.report import Report
 from ...domain.repositories.news_repository import NewsRepository
 from ...domain.repositories.email_repository import EmailRepository
 from ..services.report_service import ReportService
+from ...infrastructure.ai.openrouter_service import OpenRouterService
+from ...infrastructure.config.config import Config
+from ...infrastructure.github.github_service import GitHubService
 
 
 class NewsAggregatorUseCase:
@@ -16,6 +19,15 @@ class NewsAggregatorUseCase:
         self.news_repository = news_repository
         self.email_repository = email_repository
         self.report_service = ReportService(news_repository, email_repository)
+        
+        # Inicializar serviço de IA se configurado
+        self.openrouter_service = None
+        if Config.validate_openrouter_config():
+            self.openrouter_service = OpenRouterService(Config.OPENROUTER_API_KEY)
+            self.openrouter_service.set_model(Config.OPENROUTER_MODEL)
+        
+        # Inicializar serviço do GitHub
+        self.github_service = GitHubService()
     
     async def execute_daily_news_report(self, recipient_email: str) -> bool:
         """Executa o processo completo de busca e envio de relatório diário."""
@@ -71,6 +83,11 @@ class NewsAggregatorUseCase:
             print(f"📰 Total de notícias encontradas: {len(news_list)}")
             print(f"✅ Notícias relevantes: {len(relevant_news)}")
             
+            # Analisar notícias com IA se disponível
+            if self.openrouter_service and relevant_news:
+                print("\n🤖 Analisando notícias com IA...")
+                await self._analyze_news_with_ai(relevant_news)
+            
             # Mostrar resumo das fontes
             sources = {}
             for news in relevant_news:
@@ -124,15 +141,25 @@ class NewsAggregatorUseCase:
             print(f"❌ Erro no teste: {str(e)}")
             return False
     
-    async def execute_report_generation_only(self, save_to_file: Optional[str] = None) -> Optional[Report]:
+    async def execute_report_generation_only(self, save_to_file: Optional[str] = None, 
+                                            publish_to_github: bool = True) -> Optional[Report]:
         """Executa apenas a geração do relatório sem enviar por e-mail."""
         try:
             print("=== GERAÇÃO DE RELATÓRIO ===")
             print(f"Iniciando em {datetime.now().strftime('%d/%m/%Y às %H:%M')}")
             print("-" * 50)
             
-            # Gerar relatório
-            report = await self.report_service.generate_adam_sandler_report()
+            # Buscar notícias primeiro
+            news_list = await self.news_repository.fetch_all_adam_sandler_news()
+            relevant_news = [news for news in news_list if news.is_relevant_to_adam_sandler()]
+            
+            # Analisar notícias com IA se disponível
+            if self.openrouter_service and relevant_news:
+                print("🤖 Analisando notícias com IA...")
+                await self._analyze_news_with_ai(relevant_news)
+            
+            # Gerar relatório com as notícias já analisadas
+            report = await self.report_service.generate_adam_sandler_report_from_news(relevant_news)
             
             print(f"📊 Relatório gerado:")
             print(f"  • Título: {report.title}")
@@ -146,6 +173,12 @@ class NewsAggregatorUseCase:
                     print(f"💾 Relatório salvo em: {save_to_file}")
                 else:
                     print("❌ Falha ao salvar relatório")
+            
+            # Publicar no GitHub Pages se solicitado
+            if publish_to_github and self.github_service.is_configured():
+                await self._publish_to_github_pages(report)
+            elif publish_to_github:
+                print("⚠️ GitHub não configurado. Configure GITHUB_TOKEN e GITHUB_REPOSITORY no .env")
             
             print("-" * 50)
             return report
@@ -183,3 +216,65 @@ class NewsAggregatorUseCase:
                 "status": "error",
                 "error": str(e)
             }
+    
+    async def _analyze_news_with_ai(self, news_list: List[News]) -> None:
+        """Analisa notícias usando IA e adiciona os resultados às entidades."""
+        if not self.openrouter_service:
+            return
+        
+        for i, news in enumerate(news_list, 1):
+            try:
+                print(f"  📝 Analisando notícia {i}/{len(news_list)}: {news.title[:50]}...")
+                
+                # Analisar com IA
+                analysis = await self.openrouter_service.analyze_news(
+                    news_title=news.title,
+                    news_content=news.content,
+                    news_url=news.url,
+                    news_source=news.source
+                )
+                
+                # Adicionar análise à notícia
+                news.ai_analysis = analysis
+                print(f"  🔍 Análise: {analysis}")
+                print(f"  ✅ Análise concluída para: {news.title[:50]}...")
+                
+                # Pequena pausa entre análises para não sobrecarregar a API
+                await asyncio.sleep(1)
+                
+            except Exception as e:
+                print(f"  ❌ Erro ao analisar notícia '{news.title[:50]}...': {str(e)}")
+                continue
+        
+        print(f"🎯 Análise de IA concluída para {len(news_list)} notícias")
+    
+    async def _publish_to_github_pages(self, report: Report) -> None:
+        """Publica o relatório no GitHub Pages."""
+        try:
+            print("🌐 Publicando no GitHub Pages...")
+            
+            # Gerar HTML do relatório
+            report_html = await self.report_service.generate_html_report(report)
+            
+            # Salvar no diretório docs/
+            filepath = self.github_service.save_report_to_docs(
+                report_html, 
+                report.title, 
+                report.get_news_count()
+            )
+            
+            if filepath:
+                print(f"📄 Relatório salvo em: {filepath}")
+                
+                # Fazer commit e push
+                success = self.github_service.commit_and_push_changes()
+                
+                if success:
+                    print("✅ Relatório publicado com sucesso no GitHub Pages!")
+                else:
+                    print("❌ Erro ao publicar no GitHub Pages")
+            else:
+                print("❌ Erro ao salvar relatório no diretório docs/")
+                
+        except Exception as e:
+            print(f"❌ Erro ao publicar no GitHub Pages: {str(e)}")
