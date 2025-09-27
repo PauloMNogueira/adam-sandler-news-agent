@@ -104,19 +104,7 @@ Conteúdo:
    - Explique como esta notícia se relaciona com Adam Sandler
    - Qual o impacto ou importância para sua carreira
 
-3. **CONTEXTO E BACKGROUND** (1-2 parágrafos):
-   - Forneça contexto histórico relevante
-   - Mencione projetos, filmes ou eventos relacionados
-
-4. **ANÁLISE CRÍTICA** (1-2 parágrafos):
-   - Avalie a credibilidade e importância da notícia
-   - Identifique possíveis implicações futuras
-
-5. **TRADUÇÃO E LOCALIZAÇÃO**:
-   - Se a notícia estiver em inglês, forneça uma tradução clara para português brasileiro
-   - Adapte referências culturais quando necessário
-
-6. **CLASSIFICAÇÃO**:
+3. **CLASSIFICAÇÃO**:
    - Categoria: [Filme/TV/Negócios/Vida Pessoal/Outros]
    - Importância: [Alta/Média/Baixa]
    - Sentimento: [Positivo/Neutro/Negativo]

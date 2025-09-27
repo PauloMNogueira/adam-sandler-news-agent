@@ -132,11 +132,15 @@ class GitHubService:
             
             # Gerar JavaScript com dados dos relatórios
             reports_js = f"const reports = {json.dumps(reports, ensure_ascii=False)};"
+            print(f"JS Reports INDEX: {reports_js}")
             
-            # Substituir a linha de reports vazios no JavaScript
-            content = content.replace(
-                'const reports = [];',
-                reports_js
+            # Substituir qualquer linha que contenha "const reports = " no JavaScript
+            import re
+            content = re.sub(
+                r'const reports = .*?;',
+                reports_js,
+                content,
+                flags=re.DOTALL
             )
             
             # Salvar página atualizada

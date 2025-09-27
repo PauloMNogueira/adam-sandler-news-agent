@@ -52,7 +52,7 @@ class BBCScraper:
                     return []
                 
                 html = await response.text()
-                print(f"HTML da busca: {html[:500]}...")  # Log parte do HTML
+               
                 return await self._parse_search_results(html, max_results, session)
                 
         except asyncio.TimeoutError:
@@ -80,9 +80,7 @@ class BBCScraper:
         articles = []
         for selector in selectors:
             articles = soup.select(selector)
-            print(f"Tentando seletor '{selector}': encontrados {len(articles)} elementos")
             if articles:
-                print(f"Usando seletor '{selector}' - encontrados {len(articles)} artigos")
                 break
         
         if not articles:
@@ -108,12 +106,11 @@ class BBCScraper:
         
         for article in articles[:max_results]:
             try:
+                print(f"Processando artigo: {article}")
                 news = self._extract_news_from_article(article)
                 if news:
                     print(f"Notícia extraída: '{news.title}' - URL: {news.url}")
-                    
-                    # Buscar conteúdo completo do artigo
-                    print(f"🔍 Buscando conteúdo completo de: {news.url}")
+
                     full_content = await self.get_article_content(session, news.url)
                     if full_content and len(full_content) > len(news.content):
                         print(f"✅ Conteúdo completo encontrado ({len(full_content)} caracteres)")
@@ -181,8 +178,8 @@ class BBCScraper:
             if not content or len(content) <= 10:
                 content = title  # Usar título como conteúdo se não encontrar resumo
             
-            # Data (difícil de extrair da BBC, usar data atual)
-            published_date = datetime.now()
+            # Tentar extrair data de publicação
+            published_date = self._extract_published_date(article)
             
             # Criar notícia inicial
             news = News(
@@ -268,3 +265,50 @@ class BBCScraper:
         except Exception as e:
             print(f"Erro ao buscar conteúdo do artigo: {str(e)}")
             return None
+    
+    def _extract_published_date(self, article) -> datetime:
+        """Extrai a data de publicação do elemento span com data-testid ou usa data atual como fallback."""
+        try:
+            # Procurar elemento span com data-testid="card-metadata-lastupdated"
+            date_elem = article.find('span', {'data-testid': 'card-metadata-lastupdated'})
+            
+            if date_elem:
+                date_text = date_elem.get_text(strip=True)
+                print(f"Data encontrada no span: {date_text}")
+                
+                if date_text:
+                    # Tentar parsear diferentes formatos de data da BBC
+                    try:
+                        # Formato: "22 Aug 2017"
+                        return datetime.strptime(date_text, "%d %b %Y")
+                    except ValueError:
+                        try:
+                            # Formato: "22 August 2017"
+                            return datetime.strptime(date_text, "%d %B %Y")
+                        except ValueError:
+                            print(f"Erro ao parsear data: {date_text}")
+            
+            # Também tentar procurar elemento time como fallback
+            time_elem = article.find('time', {'datetime': True})
+            if time_elem:
+                datetime_str = time_elem.get('datetime')
+                if datetime_str:
+                    try:
+                        # Formato ISO com Z (UTC)
+                        if datetime_str.endswith('Z'):
+                            return datetime.fromisoformat(datetime_str.replace('Z', '+00:00'))
+                        # Formato ISO com timezone
+                        elif '+' in datetime_str or datetime_str.endswith('T'):
+                            return datetime.fromisoformat(datetime_str)
+                        else:
+                            return datetime.fromisoformat(datetime_str)
+                    except ValueError:
+                        print(f"Erro ao parsear datetime: {datetime_str}")
+            
+            # Fallback: usar data atual se não conseguir extrair
+            print("Nenhum elemento de data encontrado. Usando data atual.")
+            return datetime.now()
+            
+        except Exception as e:
+            print(f"Erro ao extrair data de publicação: {str(e)}")
+            return datetime.now()

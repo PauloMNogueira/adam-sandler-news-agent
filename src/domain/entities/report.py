@@ -123,6 +123,7 @@ Principais notícias:
 """
         
         for news in self.news_list:
+            print(f'DATA DE PUBLICACAO   {news.published_date}')
             html += f"""
     <div class="news-item">
         <div class="news-title">{news.title}</div>
