@@ -287,7 +287,8 @@
                 // Atualizar estatísticas
                 document.getElementById('total-reports').textContent = reports.length;
                 document.getElementById('total-news').textContent = reports.reduce((sum, r) => sum + r.newsCount, 0);
-                
+                document.getElementById('last-update').textContent = reports.length > 0 ? 
+                    new Date(reports[0].timestamp).toLocaleDateString('pt-BR') : '-';
                     
             } catch (error) {
                 console.error('Erro ao carregar relatórios:', error);
